@@ -7,7 +7,6 @@ const supabase = createClient(
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9keW92bGVtaXViY2RhdHd5aHBrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE2MzM2NTksImV4cCI6MjA4NzIwOTY1OX0.yna87uzRwmz1eLUTCZLy5DztMdqsH_SHOTLwzlotfqw"
 );
 
-// ── Helpers ───────────────────────────────────────────────────────────────
 const MONTHS_FULL = ["January","February","March","April","May","June","July","August","September","October","November","December"];
 
 function daysUntil(month, day) {
@@ -18,7 +17,7 @@ function daysUntil(month, day) {
 }
 
 function urgencyColor(d) {
-  if (d === 0) return "#FF4D6D";
+  if (d <= 0)  return "#FF4D6D";
   if (d <= 7)  return "#FF4D6D";
   if (d <= 21) return "#FF9000";
   return "#00C9A7";
@@ -33,7 +32,7 @@ function urgencyLabel(d) {
 
 function launchConfetti() {
   const colors = ["#FF4D6D","#FF9000","#00C9A7","#4A9EF0","#FFD700","#FF8FA3"];
-  for (let i = 0; i < 80; i++) {
+  for (let i = 0; i < 100; i++) {
     const el = document.createElement("div");
     el.className = "confetti-piece";
     el.style.left              = Math.random() * 100 + "vw";
@@ -50,362 +49,92 @@ function launchConfetti() {
 
 // ── CSS ───────────────────────────────────────────────────────────────────
 const CSS = `
-@import url('https://fonts.googleapis.com/css2?family=Cabinet+Grotesk:wght@400;500;700;800;900&family=Instrument+Serif:ital@0;1&family=DM+Mono:wght@400;500&family=Poppins:wght@200;300;400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cabinet+Grotesk:wght@400;500;700;800;900&family=Instrument+Serif:ital@0;1&family=DM+Mono:wght@400;500&family=Poppins:wght@300;400;500;600;700;800&display=swap');
 @import url('https://use.fontawesome.com/releases/v6.5.1/css/all.css');
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-body { font-family: 'Cabinet Grotesk', system-ui, sans-serif; }
+html, body, #root { height: 100%; }
+body { font-family: 'Cabinet Grotesk', system-ui, sans-serif; overflow: hidden; }
 
-/* ── Animated Login Box (from modern-animated-login-form) ── */
-@property --a {
-  syntax: '<angle>';
-  inherits: false;
-  initial-value: 0deg;
-}
+/* ── Animated Login ── */
+@property --a { syntax: '<angle>'; inherits: false; initial-value: 0deg; }
 
 .auth-page {
-  min-height: 100vh;
-  background: #25252b;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  padding: 20px;
-  gap: 32px;
-  position: relative;
-  overflow: hidden;
+  min-height: 100vh; background: #25252b;
+  display: flex; flex-direction: column;
+  justify-content: center; align-items: center;
+  padding: 20px; gap: 28px; position: relative; overflow: hidden;
 }
+.auth-blob-1 { position:absolute; top:-80px; left:-80px; width:500px; height:500px; background:radial-gradient(circle,rgba(255,39,112,0.1),transparent 70%); filter:blur(60px); animation:float 18s ease-in-out infinite alternate; pointer-events:none; }
+.auth-blob-2 { position:absolute; bottom:0; right:-60px; width:400px; height:400px; background:radial-gradient(circle,rgba(69,243,255,0.07),transparent 70%); filter:blur(60px); animation:float 22s ease-in-out infinite alternate-reverse; pointer-events:none; }
 
-.auth-page-blobs {
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: 0;
-}
+.auth-logo { position:relative; z-index:10; text-align:center; animation:fadeUp 0.5s cubic-bezier(0.16,1,0.3,1) both; }
+.auth-logo-icon { font-size:56px; margin-bottom:6px; display:block; }
+.auth-logo-title { font-family:'Instrument Serif',serif; font-size:42px; background:linear-gradient(135deg,#ff2770,#45f3ff); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+.auth-logo-sub { font-size:13px; color:#666; margin-top:4px; font-family:'DM Mono',monospace; letter-spacing:0.05em; }
 
-.auth-blob-1 {
-  position: absolute;
-  top: -80px; left: -80px;
-  width: 400px; height: 400px;
-  background: radial-gradient(circle, rgba(255,39,112,0.1), transparent 70%);
-  filter: blur(40px);
-  animation: float 18s ease-in-out infinite alternate;
-}
+.box { position:relative; width:420px; height:210px; background:repeating-conic-gradient(from var(--a),#ff2770 0%,#ff2770 5%,transparent 5%,transparent 40%,#ff2770 50%); filter:drop-shadow(0 15px 50px #000); border-radius:20px; animation:rotating 4s linear infinite; display:flex; justify-content:center; align-items:center; transition:0.5s; z-index:10; cursor:pointer; }
+@keyframes rotating { 0%{--a:0deg} 100%{--a:360deg} }
+.box::before { content:""; position:absolute; width:100%; height:100%; background:repeating-conic-gradient(from var(--a),#45f3ff 0%,#45f3ff 5%,transparent 5%,transparent 40%,#45f3ff 50%); filter:drop-shadow(0 15px 50px #000); border-radius:20px; animation:rotating 4s linear infinite; animation-delay:-1s; }
+.box::after { content:""; position:absolute; inset:4px; background:#2d2d39; border-radius:15px; border:8px solid #25252b; }
+.box.expanded { width:460px; height:540px; }
+.box.expanded .login { inset:40px; }
+.box.expanded .loginBx { transform:translateY(0px); }
+.login { position:absolute; inset:60px; display:flex; justify-content:center; align-items:center; flex-direction:column; border-radius:10px; background:rgba(0,0,0,0.2); color:#fff; z-index:1000; box-shadow:inset 0 10px 20px rgba(0,0,0,0.5); border-bottom:2px solid rgba(255,255,255,0.5); transition:0.5s; overflow:hidden; }
+.loginBx { position:relative; display:flex; justify-content:center; align-items:center; flex-direction:column; gap:14px; width:78%; transform:translateY(110px); transition:0.5s; }
+.loginBx h2 { text-transform:uppercase; font-weight:700; letter-spacing:0.15em; font-family:'Poppins',sans-serif; font-size:18px; color:#fff; }
+.loginBx h2 i { color:#ff2770; text-shadow:0 0 5px #ff2770,0 0 20px #ff2770; }
+.auth-mode-switch { display:flex; background:rgba(255,255,255,0.06); border-radius:30px; padding:3px; width:100%; gap:4px; }
+.auth-mode-btn { flex:1; padding:8px 0; border-radius:26px; border:none; cursor:pointer; font-family:'Poppins',sans-serif; font-size:12px; font-weight:600; letter-spacing:0.05em; text-transform:uppercase; transition:all 0.3s; background:transparent; color:#888; }
+.auth-mode-btn.active { background:linear-gradient(135deg,#ff2770,#ff5a88); color:#fff; box-shadow:0 4px 18px rgba(255,39,112,0.4); }
+.loginBx input[type="email"], .loginBx input[type="password"] { width:100%; padding:10px 18px; outline:none; border:2px solid rgba(255,255,255,0.3); font-size:0.9em; color:#fff; background:rgba(0,0,0,0.15); border-radius:30px; font-family:'Poppins',sans-serif; transition:border-color 0.3s,box-shadow 0.3s; }
+.loginBx input:focus { border-color:#45f3ff; box-shadow:0 0 12px rgba(69,243,255,0.25); }
+.loginBx input::placeholder { color:#888; }
+.auth-submit-btn { width:100%; padding:11px 20px; border:none; font-size:0.95em; color:#111; background:#45f3ff; border-radius:30px; font-weight:700; cursor:pointer; transition:0.4s; font-family:'Poppins',sans-serif; letter-spacing:0.05em; text-transform:uppercase; }
+.auth-submit-btn:hover { box-shadow:0 0 10px #45f3ff,0 0 40px rgba(69,243,255,0.5); }
+.auth-submit-btn:disabled { opacity:0.6; cursor:not-allowed; }
+.auth-links { width:100%; display:flex; justify-content:space-between; font-size:12px; font-family:'Poppins',sans-serif; }
+.auth-links a { color:#fff; text-decoration:none; cursor:pointer; }
+.auth-links a:last-child { color:#ff2770; font-weight:600; }
+.auth-hint { font-family:'Poppins',sans-serif; font-size:13px; color:#aaa; letter-spacing:0.08em; text-transform:uppercase; animation:pulse-text 2s ease-in-out infinite; }
+@keyframes pulse-text { 0%,100%{opacity:0.6} 50%{opacity:1} }
+.auth-msg { width:100%; padding:9px 14px; border-radius:20px; font-size:12px; font-family:'Poppins',sans-serif; line-height:1.4; text-align:center; }
+.auth-msg.success { background:rgba(0,201,167,0.15); border:1px solid rgba(0,201,167,0.3); color:#00C9A7; }
+.auth-msg.error { background:rgba(255,39,112,0.12); border:1px solid rgba(255,39,112,0.3); color:#ff2770; }
 
-.auth-blob-2 {
-  position: absolute;
-  bottom: 100px; right: -60px;
-  width: 300px; height: 300px;
-  background: radial-gradient(circle, rgba(69,243,255,0.07), transparent 70%);
-  filter: blur(40px);
-  animation: float 22s ease-in-out infinite alternate-reverse;
-}
+/* ── App Layout ── */
+.app-shell { display:flex; height:100vh; overflow:hidden; transition:background 0.4s; }
 
-/* Logo above box */
-.auth-logo {
-  position: relative;
-  z-index: 10;
-  text-align: center;
-  animation: fadeUp 0.5s cubic-bezier(0.16,1,0.3,1) both;
-}
+/* Sidebar */
+.sidebar { width:240px; flex-shrink:0; display:flex; flex-direction:column; padding:28px 16px; border-right:1px solid; transition:background 0.4s, border-color 0.4s; z-index:10; }
+.sidebar-logo { display:flex; align-items:center; gap:10px; padding:0 8px; margin-bottom:36px; }
+.sidebar-logo-icon { font-size:28px; }
+.sidebar-logo-text { font-family:'Instrument Serif',serif; font-size:24px; background:linear-gradient(135deg,#FF4D6D,#FF8FA3); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+.sidebar-nav { display:flex; flex-direction:column; gap:4px; flex:1; }
+.nav-btn { display:flex; align-items:center; gap:12px; padding:11px 14px; border-radius:14px; border:none; cursor:pointer; font-family:'Cabinet Grotesk',sans-serif; font-size:14px; font-weight:600; transition:all 0.2s; text-align:left; width:100%; background:transparent; }
+.nav-btn.active { background:linear-gradient(135deg,rgba(255,77,109,0.18),rgba(255,77,109,0.08)); color:#FF4D6D; box-shadow:inset 0 0 0 1px rgba(255,77,109,0.25); }
+.nav-btn .nav-icon { font-size:18px; width:22px; text-align:center; }
+.sidebar-footer { margin-top:auto; padding-top:16px; border-top:1px solid rgba(255,255,255,0.06); }
+.user-chip { display:flex; align-items:center; gap:10px; padding:10px 12px; border-radius:12px; }
+.user-avatar { width:34px; height:34px; border-radius:10px; background:linear-gradient(135deg,#FF4D6D,#FF9000); display:flex; align-items:center; justify-content:center; font-size:16px; flex-shrink:0; }
+.user-email { font-size:11px; font-family:'DM Mono',monospace; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 
-.auth-logo-icon {
-  font-size: 52px;
-  margin-bottom: 6px;
-  display: block;
-}
+/* Main content */
+.main-content { flex:1; display:flex; flex-direction:column; overflow:hidden; }
+.topbar { display:flex; align-items:center; justify-content:space-between; padding:20px 32px; border-bottom:1px solid; flex-shrink:0; transition:border-color 0.4s; }
+.topbar-title { font-family:'Instrument Serif',serif; font-size:28px; background:linear-gradient(135deg,#FF4D6D,#FF8FA3); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+.topbar-count { font-size:12px; font-family:'DM Mono',monospace; margin-top:2px; }
+.content-area { flex:1; overflow-y:auto; padding:28px 32px 32px; }
+.content-area::-webkit-scrollbar { width:4px; }
+.content-area::-webkit-scrollbar-track { background:transparent; }
+.content-area::-webkit-scrollbar-thumb { background:rgba(255,255,255,0.1); border-radius:99px; }
 
-.auth-logo-title {
-  font-family: 'Instrument Serif', serif;
-  font-size: 38px;
-  background: linear-gradient(135deg, #ff2770, #45f3ff);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  line-height: 1;
-}
-
-.auth-logo-sub {
-  font-size: 13px;
-  color: #666;
-  margin-top: 5px;
-  font-family: 'DM Mono', monospace;
-  letter-spacing: 0.05em;
-}
-
-/* The animated spinning box */
-.box {
-  position: relative;
-  width: 400px;
-  height: 200px;
-  background: repeating-conic-gradient(
-    from var(--a),
-    #ff2770 0%,
-    #ff2770 5%,
-    transparent 5%,
-    transparent 40%,
-    #ff2770 50%
-  );
-  filter: drop-shadow(0 15px 50px #000);
-  border-radius: 20px;
-  animation: rotating 4s linear infinite;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  transition: 0.5s;
-  z-index: 10;
-  cursor: pointer;
-}
-
-@keyframes rotating {
-  0%   { --a: 0deg; }
-  100% { --a: 360deg; }
-}
-
-.box::before {
-  content: "";
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  background: repeating-conic-gradient(
-    from var(--a),
-    #45f3ff 0%,
-    #45f3ff 5%,
-    transparent 5%,
-    transparent 40%,
-    #45f3ff 50%
-  );
-  filter: drop-shadow(0 15px 50px #000);
-  border-radius: 20px;
-  animation: rotating 4s linear infinite;
-  animation-delay: -1s;
-}
-
-.box::after {
-  content: "";
-  position: absolute;
-  inset: 4px;
-  background: #2d2d39;
-  border-radius: 15px;
-  border: 8px solid #25252b;
-}
-
-.box.expanded {
-  width: 450px;
-  height: 520px;
-}
-
-.box.expanded .login {
-  inset: 40px;
-}
-
-.box.expanded .loginBx {
-  transform: translateY(0px);
-}
-
-.login {
-  position: absolute;
-  inset: 60px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-direction: column;
-  border-radius: 10px;
-  background: rgba(0,0,0,0.2);
-  color: #fff;
-  z-index: 1000;
-  box-shadow: inset 0 10px 20px rgba(0,0,0,0.5);
-  border-bottom: 2px solid rgba(255,255,255,0.5);
-  transition: 0.5s;
-  overflow: hidden;
-}
-
-.loginBx {
-  position: relative;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-direction: column;
-  gap: 14px;
-  width: 78%;
-  transform: translateY(110px);
-  transition: 0.5s;
-}
-
-.loginBx h2 {
-  text-transform: uppercase;
-  font-weight: 700;
-  letter-spacing: 0.15em;
-  font-family: 'Poppins', sans-serif;
-  font-size: 18px;
-  color: #fff;
-}
-
-.loginBx h2 i {
-  color: #ff2770;
-  text-shadow: 0 0 5px #ff2770, 0 0 20px #ff2770;
-}
-
-/* Mode switcher inside box */
-.auth-mode-switch {
-  display: flex;
-  background: rgba(255,255,255,0.06);
-  border-radius: 30px;
-  padding: 3px;
-  width: 100%;
-  gap: 4px;
-}
-
-.auth-mode-btn {
-  flex: 1;
-  padding: 8px 0;
-  border-radius: 26px;
-  border: none;
-  cursor: pointer;
-  font-family: 'Poppins', sans-serif;
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-  transition: all 0.3s;
-  background: transparent;
-  color: #888;
-}
-
-.auth-mode-btn.active {
-  background: linear-gradient(135deg, #ff2770, #ff5a88);
-  color: #fff;
-  box-shadow: 0 4px 18px rgba(255,39,112,0.4);
-}
-
-/* Inputs inside the box */
-.loginBx input[type="email"],
-.loginBx input[type="password"],
-.loginBx input[type="text"] {
-  width: 100%;
-  padding: 10px 18px;
-  outline: none;
-  border: 2px solid rgba(255,255,255,0.3);
-  font-size: 0.9em;
-  color: #fff;
-  background: rgba(0,0,0,0.15);
-  border-radius: 30px;
-  font-family: 'Poppins', sans-serif;
-  transition: border-color 0.3s, box-shadow 0.3s;
-}
-
-.loginBx input[type="email"]:focus,
-.loginBx input[type="password"]:focus,
-.loginBx input[type="text"]:focus {
-  border-color: #45f3ff;
-  box-shadow: 0 0 12px rgba(69,243,255,0.25);
-  outline: none;
-}
-
-.loginBx input::placeholder { color: #888; }
-
-/* Submit button */
-.auth-submit-btn {
-  width: 100%;
-  padding: 11px 20px;
-  outline: none;
-  border: none;
-  font-size: 0.95em;
-  color: #111;
-  background: #45f3ff;
-  border-radius: 30px;
-  font-weight: 700;
-  cursor: pointer;
-  transition: 0.4s;
-  font-family: 'Poppins', sans-serif;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-}
-
-.auth-submit-btn:hover {
-  box-shadow: 0 0 10px #45f3ff, 0 0 40px rgba(69,243,255,0.5);
-}
-
-.auth-submit-btn:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
-.auth-links {
-  width: 100%;
-  display: flex;
-  justify-content: space-between;
-  font-size: 12px;
-  font-family: 'Poppins', sans-serif;
-}
-
-.auth-links a {
-  color: #fff;
-  text-decoration: none;
-  cursor: pointer;
-  transition: color 0.2s;
-}
-
-.auth-links a:last-child {
-  color: #ff2770;
-  font-weight: 600;
-}
-
-.auth-links a:hover { opacity: 0.8; }
-
-/* Hint text (collapsed state) */
-.auth-hint {
-  font-family: 'Poppins', sans-serif;
-  font-size: 13px;
-  color: #aaa;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  text-align: center;
-  animation: pulse-text 2s ease-in-out infinite;
-}
-
-@keyframes pulse-text {
-  0%, 100% { opacity: 0.6; }
-  50%       { opacity: 1; }
-}
-
-/* Auth message */
-.auth-msg {
-  width: 100%;
-  padding: 9px 14px;
-  border-radius: 20px;
-  font-size: 12px;
-  font-family: 'Poppins', sans-serif;
-  line-height: 1.4;
-  text-align: center;
-}
-
-.auth-msg.success {
-  background: rgba(0,201,167,0.15);
-  border: 1px solid rgba(0,201,167,0.3);
-  color: #00C9A7;
-}
-
-.auth-msg.error {
-  background: rgba(255,39,112,0.12);
-  border: 1px solid rgba(255,39,112,0.3);
-  color: #ff2770;
-}
+/* Cards grid for upcoming */
+.cards-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(340px, 1fr)); gap:14px; }
 
 /* ── Glowy Button ── */
 :root { --gx:200; --gy:400; --gxp:.5; --gsize:130px; }
-.glowy-btn {
-  --hue: calc(340 + (var(--gxp) * 60));
-  --glow: radial-gradient(50% 50% at center, hsl(var(--hue) 90% 75%), hsl(var(--hue) 80% 60%), transparent)
-    calc(var(--gx)*1px - var(--gsize)*.5) calc(var(--gy)*1px - var(--gsize)*.5)/var(--gsize) var(--gsize) no-repeat fixed;
-  --btn-bg: #0f0f1a;
-  width:100%; padding:15px; border-radius:14px; border:3px solid transparent;
-  background: linear-gradient(var(--btn-bg),var(--btn-bg)) padding-box, var(--glow), linear-gradient(#000,#000) border-box;
-  box-shadow: 0 1px rgba(255,255,255,0.1) inset;
-  cursor:pointer; touch-action:none; position:relative;
-  font-family:'Cabinet Grotesk',sans-serif; font-size:15px; font-weight:800; letter-spacing:0.03em;
-  transition: background-size 0.2s;
-}
+.glowy-btn { --hue:calc(340 + (var(--gxp)*60)); --glow:radial-gradient(50% 50% at center,hsl(var(--hue) 90% 75%),hsl(var(--hue) 80% 60%),transparent) calc(var(--gx)*1px - var(--gsize)*.5) calc(var(--gy)*1px - var(--gsize)*.5)/var(--gsize) var(--gsize) no-repeat fixed; --btn-bg:#0f0f1a; width:100%; padding:15px; border-radius:14px; border:3px solid transparent; background:linear-gradient(var(--btn-bg),var(--btn-bg)) padding-box,var(--glow),linear-gradient(#000,#000) border-box; box-shadow:0 1px rgba(255,255,255,0.1) inset; cursor:pointer; touch-action:none; position:relative; font-family:'Cabinet Grotesk',sans-serif; font-size:15px; font-weight:800; letter-spacing:0.03em; transition:background-size 0.2s; }
 .glowy-btn::before { content:""; position:absolute; inset:0; background:var(--btn-bg); z-index:2; border-radius:12px; box-shadow:0 1px rgba(255,255,255,0.1) inset; }
 .glowy-btn::after  { content:""; position:absolute; inset:-3px; filter:blur(18px); border:3px solid transparent; background:var(--glow); border-radius:14px; }
 .glowy-btn span    { background:var(--glow),white; background-clip:text; -webkit-background-clip:text; color:transparent; position:relative; z-index:3; }
@@ -479,38 +208,32 @@ body { font-family: 'Cabinet Grotesk', system-ui, sans-serif; }
 .bb8-toggle__checkbox:active+.bb8-toggle__container .bb8__head-container{transform:rotate(25deg);}
 .bb8-toggle__checkbox:checked:active+.bb8-toggle__container .bb8__head-container{transform:rotate(-25deg);}
 
-@keyframes fadeUp    { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
-@keyframes slideIn   { from{opacity:0;transform:translateX(-8px)} to{opacity:1;transform:translateX(0)} }
-@keyframes toastIn   { from{opacity:0;transform:translate(-50%,16px) scale(0.95)} to{opacity:1;transform:translate(-50%,0) scale(1)} }
-@keyframes float     { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-6px)} }
-@keyframes spin      { to{transform:rotate(360deg)} }
-@keyframes pulse-ring{ 0%{box-shadow:0 0 0 0 rgba(255,77,109,0.4)} 70%{box-shadow:0 0 0 10px rgba(255,77,109,0)} 100%{box-shadow:0 0 0 0 rgba(255,77,109,0)} }
-@keyframes confetti-fall { 0%{transform:translateY(-20px) rotate(0deg);opacity:1} 100%{transform:translateY(700px) rotate(720deg);opacity:0} }
+@keyframes fadeUp  { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
+@keyframes slideIn { from{opacity:0;transform:translateX(-10px)} to{opacity:1;transform:translateX(0)} }
+@keyframes toastIn { from{opacity:0;transform:translate(-50%,16px) scale(0.95)} to{opacity:1;transform:translate(-50%,0) scale(1)} }
+@keyframes float   { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
+@keyframes spin    { to{transform:rotate(360deg)} }
+@keyframes pulse-ring { 0%{box-shadow:0 0 0 0 rgba(255,77,109,0.4)} 70%{box-shadow:0 0 0 10px rgba(255,77,109,0)} 100%{box-shadow:0 0 0 0 rgba(255,77,109,0)} }
+@keyframes confetti-fall { 0%{transform:translateY(-20px) rotate(0deg);opacity:1} 100%{transform:translateY(100vh) rotate(720deg);opacity:0} }
 
-.confetti-piece { position:fixed; top:0; animation:confetti-fall linear forwards; z-index:9999; pointer-events:none; border-radius:2px; }
-.bday-card      { transition:transform 0.18s ease,box-shadow 0.18s ease; }
-.bday-card:hover{ transform:translateY(-2px); box-shadow:0 8px 32px rgba(0,0,0,0.35) !important; }
-.delete-btn     { opacity:0; transition:opacity 0.2s; }
+.confetti-piece { position:fixed; top:0; animation:confetti-fall linear forwards; z-index:9999; pointer-events:none; }
+.bday-card { transition:transform 0.18s ease,box-shadow 0.18s ease; }
+.bday-card:hover { transform:translateY(-3px); }
+.delete-btn { opacity:0; transition:opacity 0.2s; }
 .bday-card:hover .delete-btn { opacity:1; }
-.scroll-area::-webkit-scrollbar       { width:3px; }
-.scroll-area::-webkit-scrollbar-track { background:transparent; }
-.scroll-area::-webkit-scrollbar-thumb { background:rgba(255,255,255,0.1); border-radius:99px; }
-.ring-fill   { transition:stroke-dashoffset 1.4s cubic-bezier(0.16,1,0.3,1); }
-.tab-pill    { transition:background 0.2s,color 0.2s,box-shadow 0.2s; }
-.tab-pill.active-tab { background:linear-gradient(135deg,#FF4D6D,#FF1744) !important; color:#fff !important; box-shadow:0 4px 18px rgba(255,77,109,0.4); }
-.nav-item    { transition:color 0.2s; cursor:pointer; }
-.bp-input:focus  { outline:none; border-color:rgba(255,77,109,0.5) !important; box-shadow:0 0 0 3px rgba(255,77,109,0.12); }
+.ring-fill { transition:stroke-dashoffset 1.4s cubic-bezier(0.16,1,0.3,1); }
+.bp-input:focus { outline:none; border-color:rgba(255,77,109,0.5)!important; box-shadow:0 0 0 3px rgba(255,77,109,0.12); }
 .remind-chip { transition:all 0.15s; }
-.remind-chip.active-chip { border-color:#FF4D6D !important; background:rgba(255,77,109,0.15) !important; color:#FF4D6D !important; }
-.bp-toggle      { width:38px; height:22px; border-radius:99px; position:relative; cursor:pointer; transition:background 0.2s; flex-shrink:0; }
+.remind-chip.active-chip { border-color:#FF4D6D!important; background:rgba(255,77,109,0.15)!important; color:#FF4D6D!important; }
+.bp-toggle { width:38px; height:22px; border-radius:99px; position:relative; cursor:pointer; transition:background 0.2s; flex-shrink:0; }
 .bp-toggle-knob { position:absolute; top:3px; width:16px; height:16px; border-radius:50%; background:#fff; transition:left 0.2s; box-shadow:0 1px 4px rgba(0,0,0,0.3); }
 `;
 
 // ── Spinner ───────────────────────────────────────────────────────────────
 function Spinner() {
   return (
-    <div style={{ display:"flex", justifyContent:"center", alignItems:"center", padding:"60px 0" }}>
-      <div style={{ width:36, height:36, border:"3px solid rgba(255,77,109,0.2)", borderTop:"3px solid #FF4D6D", borderRadius:"50%", animation:"spin 0.8s linear infinite" }}/>
+    <div style={{ display:"flex", justifyContent:"center", alignItems:"center", padding:"80px 0" }}>
+      <div style={{ width:40, height:40, border:"3px solid rgba(255,77,109,0.2)", borderTop:"3px solid #FF4D6D", borderRadius:"50%", animation:"spin 0.8s linear infinite" }}/>
     </div>
   );
 }
@@ -519,10 +242,10 @@ function Spinner() {
 function BB8Toggle({ checked, onChange }) {
   return (
     <label className="bb8-toggle">
-      <input className="bb8-toggle__checkbox" type="checkbox" checked={checked} onChange={onChange} />
+      <input className="bb8-toggle__checkbox" type="checkbox" checked={checked} onChange={onChange}/>
       <div className="bb8-toggle__container">
         <div className="bb8-toggle__scenery">
-          {[...Array(7)].map((_,i) => <div key={i} className="bb8-toggle__star"/>)}
+          {[...Array(7)].map((_,i)=><div key={i} className="bb8-toggle__star"/>)}
           <div className="tatto-1"/><div className="tatto-2"/>
           <div className="gomrassen"/><div className="hermes"/><div className="chenini"/>
           <div className="bb8-toggle__cloud"/><div className="bb8-toggle__cloud"/><div className="bb8-toggle__cloud"/>
@@ -558,7 +281,7 @@ function GlowyButton({ onClick, children, disabled }) {
   );
 }
 
-// ── Auth Screen (NEW — animated jump login form) ──────────────────────────
+// ── Auth Screen ───────────────────────────────────────────────────────────
 function AuthScreen() {
   const [expanded, setExpanded] = useState(false);
   const [mode,     setMode]     = useState("login");
@@ -585,115 +308,51 @@ function AuthScreen() {
   return (
     <div className="auth-page">
       <style>{CSS}</style>
-
-      {/* Ambient blobs */}
-      <div className="auth-page-blobs">
-        <div className="auth-blob-1"/>
-        <div className="auth-blob-2"/>
-      </div>
-
-      {/* Logo */}
+      <div className="auth-blob-1"/><div className="auth-blob-2"/>
       <div className="auth-logo">
         <span className="auth-logo-icon">🎂</span>
         <div className="auth-logo-title">BirthdayPal</div>
         <div className="auth-logo-sub">Never miss a birthday again</div>
       </div>
-
-      {/* Animated spinning box — click to expand */}
-      <div
-        className={`box${expanded ? " expanded" : ""}`}
-        onClick={() => !expanded && setExpanded(true)}
-      >
+      <div className={`box${expanded?" expanded":""}`} onClick={()=>!expanded&&setExpanded(true)}>
         <div className="login">
           <div className="loginBx">
-
-            {/* Icon + title */}
-            <h2>
-              <i className="fa-solid fa-cake-candles" style={{ marginRight:8 }}/>
-              {mode === "login" ? "Log In" : "Sign Up"}
-              <i className="fa-solid fa-birthday-cake" style={{ marginLeft:8 }}/>
-            </h2>
-
-            {/* Mode switcher — only visible when expanded */}
+            <h2><i className="fa-solid fa-cake-candles" style={{marginRight:8}}/>
+              {mode==="login"?"Log In":"Sign Up"}
+            <i className="fa-solid fa-heart" style={{marginLeft:8}}/></h2>
             {expanded && (
               <div className="auth-mode-switch">
-                {["login","signup"].map(m => (
-                  <button
-                    key={m}
-                    className={`auth-mode-btn${mode===m?" active":""}`}
-                    onClick={e => { e.stopPropagation(); setMode(m); setMsg(""); }}
-                  >
-                    {m === "login" ? "Log In" : "Sign Up"}
+                {["login","signup"].map(m=>(
+                  <button key={m} className={`auth-mode-btn${mode===m?" active":""}`}
+                    onClick={e=>{e.stopPropagation();setMode(m);setMsg("");}}>
+                    {m==="login"?"Log In":"Sign Up"}
                   </button>
                 ))}
               </div>
             )}
-
-            {/* Collapsed hint */}
-            {!expanded && (
-              <div className="auth-hint">Tap to get started ✨</div>
-            )}
-
-            {/* Fields */}
-            {expanded && (
-              <>
-                <input
-                  type="email"
-                  placeholder="✉ Email address"
-                  value={email}
-                  onChange={e => setEmail(e.target.value)}
-                  onClick={e => e.stopPropagation()}
-                />
-                <input
-                  type="password"
-                  placeholder="🔒 Password"
-                  value={password}
-                  onChange={e => setPassword(e.target.value)}
-                  onClick={e => e.stopPropagation()}
-                  onKeyDown={e => e.key === "Enter" && handleSubmit()}
-                />
-
-                {/* Status message */}
-                {msg && (
-                  <div className={`auth-msg ${msg.startsWith("✅") ? "success" : "error"}`}>
-                    {msg}
-                  </div>
-                )}
-
-                {/* Submit */}
-                <button
-                  className="auth-submit-btn"
-                  disabled={loading}
-                  onClick={e => { e.stopPropagation(); handleSubmit(); }}
-                >
-                  {loading
-                    ? "Please wait…"
-                    : mode === "login" ? "🚀 Log In" : "🎉 Create Account"
-                  }
-                </button>
-
-                {/* Links */}
-                <div className="auth-links" onClick={e => e.stopPropagation()}>
-                  <a href="#">Forgot Password?</a>
-                  <a onClick={() => { setMode(mode === "login" ? "signup" : "login"); setMsg(""); }}>
-                    {mode === "login" ? "Sign up free →" : "← Back to login"}
-                  </a>
-                </div>
-              </>
-            )}
-
+            {!expanded && <div className="auth-hint">Click to get started ✨</div>}
+            {expanded && <>
+              <input type="email" placeholder="✉ Email address" value={email} onChange={e=>setEmail(e.target.value)} onClick={e=>e.stopPropagation()}/>
+              <input type="password" placeholder="🔒 Password" value={password} onChange={e=>setPassword(e.target.value)} onClick={e=>e.stopPropagation()} onKeyDown={e=>e.key==="Enter"&&handleSubmit()}/>
+              {msg && <div className={`auth-msg ${msg.startsWith("✅")?"success":"error"}`}>{msg}</div>}
+              <button className="auth-submit-btn" disabled={loading} onClick={e=>{e.stopPropagation();handleSubmit();}}>
+                {loading?"Please wait…":mode==="login"?"🚀 Log In":"🎉 Create Account"}
+              </button>
+              <div className="auth-links" onClick={e=>e.stopPropagation()}>
+                <a href="#">Forgot Password?</a>
+                <a onClick={()=>{setMode(mode==="login"?"signup":"login");setMsg("");}}>
+                  {mode==="login"?"Sign up free →":"← Back to login"}
+                </a>
+              </div>
+            </>}
           </div>
         </div>
       </div>
-
-      {/* Close / collapse hint */}
       {expanded && (
-        <div
-          onClick={() => { setExpanded(false); setMsg(""); }}
-          style={{ position:"relative", zIndex:10, fontSize:12, color:"#555", cursor:"pointer", fontFamily:"'Poppins',sans-serif", letterSpacing:"0.05em", transition:"color 0.2s" }}
-          onMouseEnter={e => e.target.style.color="#ff2770"}
-          onMouseLeave={e => e.target.style.color="#555"}
-        >
+        <div onClick={()=>{setExpanded(false);setMsg("");}}
+          style={{position:"relative",zIndex:10,fontSize:12,color:"#555",cursor:"pointer",fontFamily:"'Poppins',sans-serif"}}
+          onMouseEnter={e=>e.target.style.color="#ff2770"}
+          onMouseLeave={e=>e.target.style.color="#555"}>
           ↑ Collapse
         </div>
       )}
@@ -702,31 +361,28 @@ function AuthScreen() {
 }
 
 // ── Countdown Ring ────────────────────────────────────────────────────────
-function CountdownRing({ days, name, avatar, light }) {
-  const r=52, circ=2*Math.PI*r;
+function CountdownRing({ days, name, avatar, color, light }) {
+  const r=44, circ=2*Math.PI*r;
   const pct=Math.max(0,Math.min(1,1-days/365));
-  const color=urgencyColor(days);
   return (
-    <div style={{ background:light?"linear-gradient(135deg,rgba(255,77,109,0.08),rgba(255,144,0,0.05))":"linear-gradient(135deg,rgba(255,77,109,0.1),rgba(255,144,0,0.06))", border:`1px solid ${light?"rgba(255,77,109,0.15)":"rgba(255,77,109,0.2)"}`, borderRadius:24, padding:"20px 20px 16px", marginBottom:14, position:"relative", overflow:"hidden", animation:"fadeUp 0.5s ease both" }}>
-      <div style={{ position:"absolute", top:-40, right:-40, width:140, height:140, background:`radial-gradient(circle,${color}22,transparent 70%)`, pointerEvents:"none" }}/>
-      <div style={{ display:"flex", alignItems:"center", gap:16 }}>
-        <div style={{ position:"relative", width:120, height:120, flexShrink:0 }}>
-          <svg width="120" height="120" style={{ transform:"rotate(-90deg)" }}>
-            <circle cx="60" cy="60" r={r} fill="none" stroke={light?"rgba(0,0,0,0.06)":"rgba(255,255,255,0.06)"} strokeWidth="7"/>
-            <circle cx="60" cy="60" r={r} fill="none" stroke={color} strokeWidth="7" strokeLinecap="round" strokeDasharray={circ} strokeDashoffset={circ*(1-pct)} className="ring-fill" style={{ filter:`drop-shadow(0 0 6px ${color}88)` }}/>
-          </svg>
-          <div style={{ position:"absolute", inset:0, display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", gap:2 }}>
-            <span style={{ fontSize:32, lineHeight:1 }}>{avatar}</span>
-            <span style={{ fontFamily:"'DM Mono',monospace", fontSize:11, color:days===0?color:light?"#555":"#aaa", fontWeight:500 }}>{days===0?"TODAY":`${days}d`}</span>
-          </div>
+    <div style={{ background:light?"rgba(255,255,255,0.9)":"rgba(255,255,255,0.05)", border:`1px solid ${light?"rgba(0,0,0,0.07)":"rgba(255,255,255,0.08)"}`, borderRadius:20, padding:"20px 22px", display:"flex", alignItems:"center", gap:18, boxShadow:light?"0 2px 20px rgba(0,0,0,0.07)":"none", animation:"fadeUp 0.5s ease both", position:"relative", overflow:"hidden" }}>
+      <div style={{ position:"absolute", top:-30, right:-30, width:120, height:120, background:`radial-gradient(circle,${color}22,transparent 70%)`, pointerEvents:"none" }}/>
+      <div style={{ position:"relative", width:100, height:100, flexShrink:0 }}>
+        <svg width="100" height="100" style={{ transform:"rotate(-90deg)" }}>
+          <circle cx="50" cy="50" r={r} fill="none" stroke={light?"rgba(0,0,0,0.06)":"rgba(255,255,255,0.06)"} strokeWidth="6"/>
+          <circle cx="50" cy="50" r={r} fill="none" stroke={color} strokeWidth="6" strokeLinecap="round" strokeDasharray={circ} strokeDashoffset={circ*(1-pct)} className="ring-fill" style={{ filter:`drop-shadow(0 0 6px ${color}88)` }}/>
+        </svg>
+        <div style={{ position:"absolute", inset:0, display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center" }}>
+          <span style={{ fontSize:28, lineHeight:1 }}>{avatar}</span>
+          <span style={{ fontFamily:"'DM Mono',monospace", fontSize:10, color:light?"#777":"#aaa", marginTop:2 }}>{days===0?"TODAY":`${days}d`}</span>
         </div>
-        <div style={{ flex:1, minWidth:0 }}>
-          <div style={{ fontSize:11, fontWeight:700, letterSpacing:"0.12em", textTransform:"uppercase", color, marginBottom:4 }}>Coming up next</div>
-          <div style={{ fontFamily:"'Instrument Serif',serif", fontSize:26, color:light?"#111":"#F0ECF8", lineHeight:1.15, marginBottom:6 }}>{name}</div>
-          <div style={{ display:"inline-flex", alignItems:"center", gap:5, background:`${color}18`, border:`1px solid ${color}33`, borderRadius:99, padding:"4px 12px" }}>
-            <span style={{ width:6, height:6, borderRadius:"50%", background:color, animation:days<=7?"pulse-ring 1.5s infinite":"none", display:"inline-block" }}/>
-            <span style={{ fontFamily:"'DM Mono',monospace", fontSize:12, color, fontWeight:500 }}>{urgencyLabel(days)}</span>
-          </div>
+      </div>
+      <div>
+        <div style={{ fontSize:10, fontWeight:700, letterSpacing:"0.12em", textTransform:"uppercase", color, marginBottom:4 }}>Next birthday</div>
+        <div style={{ fontFamily:"'Instrument Serif',serif", fontSize:22, color:light?"#111":"#F0ECF8", lineHeight:1.2, marginBottom:8 }}>{name}</div>
+        <div style={{ display:"inline-flex", alignItems:"center", gap:6, background:`${color}18`, border:`1px solid ${color}33`, borderRadius:99, padding:"4px 12px" }}>
+          <span style={{ width:6, height:6, borderRadius:"50%", background:color, animation:days<=7?"pulse-ring 1.5s infinite":"none", display:"inline-block" }}/>
+          <span style={{ fontFamily:"'DM Mono',monospace", fontSize:12, color, fontWeight:500 }}>{urgencyLabel(days)}</span>
         </div>
       </div>
     </div>
@@ -737,30 +393,25 @@ function CountdownRing({ days, name, avatar, light }) {
 function BirthdayCard({ person, light, delay=0, onDelete }) {
   const d=daysUntil(person.month,person.day);
   const color=urgencyColor(d);
-  const age=person.year ? new Date().getFullYear()-person.year : null;
+  const age=person.year?new Date().getFullYear()-person.year:null;
   return (
-    <div className="bday-card" style={{ background:light?"rgba(255,255,255,0.9)":"rgba(255,255,255,0.04)", border:`1px solid ${light?"rgba(0,0,0,0.07)":"rgba(255,255,255,0.07)"}`, borderRadius:20, padding:"14px 16px", marginBottom:8, boxShadow:light?"0 2px 14px rgba(0,0,0,0.07)":"none", animation:`slideIn 0.35s ease both`, animationDelay:`${delay}ms`, position:"relative" }}>
-      <div style={{ position:"absolute", left:0, top:14, bottom:14, width:3, background:color, borderRadius:"0 4px 4px 0", opacity:0.8 }}/>
-      <div style={{ display:"flex", alignItems:"center", gap:13, paddingLeft:6 }}>
-        <div style={{ width:50, height:50, borderRadius:16, flexShrink:0, background:`linear-gradient(135deg,${color}25,${color}10)`, border:`1.5px solid ${color}40`, display:"flex", alignItems:"center", justifyContent:"center", fontSize:24 }}>{person.avatar}</div>
+    <div className="bday-card" style={{ background:light?"rgba(255,255,255,0.9)":"rgba(255,255,255,0.04)", border:`1px solid ${light?"rgba(0,0,0,0.07)":"rgba(255,255,255,0.06)"}`, borderRadius:18, padding:"16px 18px", boxShadow:light?"0 2px 14px rgba(0,0,0,0.06)":"none", animation:`slideIn 0.35s ease both`, animationDelay:`${delay}ms`, position:"relative" }}>
+      <div style={{ position:"absolute", left:0, top:16, bottom:16, width:3, background:color, borderRadius:"0 4px 4px 0", opacity:0.9 }}/>
+      <div style={{ display:"flex", alignItems:"center", gap:14, paddingLeft:8 }}>
+        <div style={{ width:52, height:52, borderRadius:16, flexShrink:0, background:`linear-gradient(135deg,${color}25,${color}10)`, border:`1.5px solid ${color}40`, display:"flex", alignItems:"center", justifyContent:"center", fontSize:26 }}>{person.avatar}</div>
         <div style={{ flex:1, minWidth:0 }}>
-          <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:2 }}>
-            <span style={{ fontFamily:"'Instrument Serif',serif", fontSize:17, color:light?"#111":"#F0ECF8" }}>
+          <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:3 }}>
+            <span style={{ fontFamily:"'Instrument Serif',serif", fontSize:18, color:light?"#111":"#F0ECF8" }}>
               {person.name}
-              {age ? <span style={{ fontSize:12, color:light?"#aaa":"#666", marginLeft:6 }}>turns {age}</span> : null}
+              {age?<span style={{ fontSize:12, color:light?"#bbb":"#666", marginLeft:7 }}>turns {age}</span>:null}
             </span>
             <div style={{ display:"flex", alignItems:"center", gap:6 }}>
               <span style={{ fontFamily:"'DM Mono',monospace", fontSize:11, fontWeight:500, color, background:`${color}15`, padding:"3px 10px", borderRadius:99, border:`1px solid ${color}30` }}>{urgencyLabel(d)}</span>
-              <button className="delete-btn" onClick={() => onDelete(person.id)} style={{ background:"rgba(255,77,109,0.12)", border:"1px solid rgba(255,77,109,0.25)", borderRadius:8, color:"#FF4D6D", fontSize:13, cursor:"pointer", padding:"3px 8px" }}>🗑</button>
+              <button className="delete-btn" onClick={()=>onDelete(person.id)} style={{ background:"rgba(255,77,109,0.12)", border:"1px solid rgba(255,77,109,0.25)", borderRadius:8, color:"#FF4D6D", fontSize:13, cursor:"pointer", padding:"3px 8px" }}>🗑</button>
             </div>
           </div>
-          <div style={{ fontSize:12, color:light?"#999":"#666", marginBottom:4 }}>🎂 {MONTHS_FULL[person.month-1]} {person.day}</div>
-          {person.note && <div style={{ fontSize:12, color:light?"#aaa":"#555", fontStyle:"italic", fontFamily:"'Instrument Serif',serif" }}>"{person.note}"</div>}
-          <div style={{ display:"flex", gap:4, marginTop:8, flexWrap:"wrap" }}>
-            {[["✉️","Email"],["🔔","Push"],["📱","In-app"]].map(([ic,lb]) => (
-              <span key={lb} style={{ fontSize:10, padding:"2px 8px", borderRadius:99, background:light?"rgba(0,0,0,0.05)":"rgba(255,255,255,0.06)", border:`1px solid ${light?"rgba(0,0,0,0.08)":"rgba(255,255,255,0.08)"}`, color:light?"#888":"#666", display:"inline-flex", alignItems:"center", gap:3 }}>{ic} {lb}</span>
-            ))}
-          </div>
+          <div style={{ fontSize:12, color:light?"#aaa":"#666", marginBottom:person.note?4:0 }}>🎂 {MONTHS_FULL[person.month-1]} {person.day}</div>
+          {person.note&&<div style={{ fontSize:12, color:light?"#bbb":"#555", fontStyle:"italic", fontFamily:"'Instrument Serif',serif" }}>"{person.note}"</div>}
         </div>
       </div>
     </div>
@@ -773,38 +424,41 @@ function AddForm({ onAdd, light }) {
   const [year,setYear]=useState(""); const [note,setNote]=useState(""); const [remind,setRemind]=useState("1 week");
   const [avatar,setAvatar]=useState("🎂"); const [saving,setSaving]=useState(false);
   const avatarOptions=["🎂","👩","🧑","👨","👧","👦","👴","👵","🌟","💫","🎉","🎊"];
-  const inp={ width:"100%", padding:"11px 14px", background:light?"rgba(0,0,0,0.04)":"rgba(255,255,255,0.05)", border:`1px solid ${light?"rgba(0,0,0,0.1)":"rgba(255,255,255,0.09)"}`, borderRadius:12, color:light?"#111":"#F0ECF8", fontSize:14, fontFamily:"'Cabinet Grotesk',sans-serif", marginBottom:11, display:"block" };
+  const inp={ width:"100%", padding:"12px 16px", background:light?"rgba(0,0,0,0.04)":"rgba(255,255,255,0.05)", border:`1px solid ${light?"rgba(0,0,0,0.1)":"rgba(255,255,255,0.09)"}`, borderRadius:12, color:light?"#111":"#F0ECF8", fontSize:14, fontFamily:"'Cabinet Grotesk',sans-serif", marginBottom:12, display:"block" };
   const lbl={ fontSize:10, color:light?"#aaa":"#666", letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:5, display:"block", fontFamily:"'DM Mono',monospace", fontWeight:500 };
   const handleSubmit=async()=>{ if(!name||!month||!day) return; setSaving(true); await onAdd(name,Number(month),Number(day),year?Number(year):null,note,avatar); setName("");setMonth("");setDay("");setYear("");setNote("");setAvatar("🎂"); setSaving(false); };
+
   return (
-    <div style={{ paddingTop:4, animation:"fadeUp 0.3s ease both" }}>
-      <p style={{ color:light?"#999":"#666", fontSize:13, marginBottom:18, lineHeight:1.6 }}>Saved to your account — accessible on any device.</p>
+    <div style={{ maxWidth:560, animation:"fadeUp 0.3s ease both" }}>
+      <p style={{ color:light?"#999":"#666", fontSize:14, marginBottom:24, lineHeight:1.6 }}>Add a birthday and we'll make sure you never forget it.</p>
       <label style={lbl}>Pick an avatar</label>
-      <div style={{ display:"flex", gap:6, flexWrap:"wrap", marginBottom:14 }}>
+      <div style={{ display:"flex", gap:8, flexWrap:"wrap", marginBottom:16 }}>
         {avatarOptions.map(a=>(
-          <button key={a} onClick={()=>setAvatar(a)} style={{ width:38, height:38, borderRadius:10, fontSize:18, background:avatar===a?"rgba(255,77,109,0.15)":light?"rgba(0,0,0,0.04)":"rgba(255,255,255,0.05)", border:`1.5px solid ${avatar===a?"#FF4D6D":light?"rgba(0,0,0,0.08)":"rgba(255,255,255,0.08)"}`, cursor:"pointer", transition:"all 0.15s", transform:avatar===a?"scale(1.12)":"scale(1)" }}>{a}</button>
+          <button key={a} onClick={()=>setAvatar(a)} style={{ width:42, height:42, borderRadius:12, fontSize:20, background:avatar===a?"rgba(255,77,109,0.15)":light?"rgba(0,0,0,0.04)":"rgba(255,255,255,0.05)", border:`1.5px solid ${avatar===a?"#FF4D6D":light?"rgba(0,0,0,0.08)":"rgba(255,255,255,0.08)"}`, cursor:"pointer", transition:"all 0.15s", transform:avatar===a?"scale(1.12)":"scale(1)" }}>{a}</button>
         ))}
       </div>
       <label style={lbl}>Name</label>
       <input className="bp-input" style={inp} placeholder="e.g. Mom, Jake, Grandma…" value={name} onChange={e=>setName(e.target.value)}/>
       <label style={lbl}>Birthday</label>
-      <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:8, marginBottom:11 }}>
+      <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:10, marginBottom:12 }}>
         <select className="bp-input" value={month} onChange={e=>setMonth(e.target.value)} style={{...inp,marginBottom:0}}>
           <option value="">Month</option>
           {MONTHS_FULL.map((m,i)=><option key={m} value={i+1}>{m}</option>)}
         </select>
-        <input className="bp-input" style={{...inp,marginBottom:0}} type="number" placeholder="Day"  min={1} max={31} value={day}  onChange={e=>setDay(e.target.value)}/>
+        <input className="bp-input" style={{...inp,marginBottom:0}} type="number" placeholder="Day" min={1} max={31} value={day} onChange={e=>setDay(e.target.value)}/>
         <input className="bp-input" style={{...inp,marginBottom:0}} type="number" placeholder="Year" min={1900} max={new Date().getFullYear()} value={year} onChange={e=>setYear(e.target.value)}/>
       </div>
       <label style={lbl}>Note (optional)</label>
       <input className="bp-input" style={inp} placeholder="e.g. Loves sunflowers…" value={note} onChange={e=>setNote(e.target.value)}/>
       <label style={lbl}>Remind me</label>
-      <div style={{ display:"flex", gap:5, marginBottom:18 }}>
+      <div style={{ display:"flex", gap:6, marginBottom:24 }}>
         {["1 day","3 days","1 week","2 weeks"].map(o=>(
-          <button key={o} className={`remind-chip ${remind===o?"active-chip":""}`} onClick={()=>setRemind(o)} style={{ flex:1, padding:"7px 2px", borderRadius:10, cursor:"pointer", border:`1px solid ${remind===o?"#FF4D6D":light?"rgba(0,0,0,0.1)":"rgba(255,255,255,0.08)"}`, background:remind===o?"rgba(255,77,109,0.12)":light?"rgba(0,0,0,0.04)":"rgba(255,255,255,0.04)", color:remind===o?"#FF4D6D":light?"#888":"#666", fontSize:11, fontFamily:"'DM Mono',monospace", fontWeight:500 }}>{o}</button>
+          <button key={o} className={`remind-chip ${remind===o?"active-chip":""}`} onClick={()=>setRemind(o)} style={{ flex:1, padding:"8px 4px", borderRadius:10, cursor:"pointer", border:`1px solid ${remind===o?"#FF4D6D":light?"rgba(0,0,0,0.1)":"rgba(255,255,255,0.08)"}`, background:remind===o?"rgba(255,77,109,0.12)":light?"rgba(0,0,0,0.04)":"rgba(255,255,255,0.04)", color:remind===o?"#FF4D6D":light?"#888":"#666", fontSize:12, fontFamily:"'DM Mono',monospace", fontWeight:500 }}>{o}</button>
         ))}
       </div>
-      <GlowyButton onClick={handleSubmit} disabled={saving}>{saving?"Saving to database…":"🎉 Add Birthday Reminder"}</GlowyButton>
+      <div style={{ maxWidth:300 }}>
+        <GlowyButton onClick={handleSubmit} disabled={saving}>{saving?"Saving…":"🎉 Add Birthday"}</GlowyButton>
+      </div>
     </div>
   );
 }
@@ -821,27 +475,27 @@ function ToggleSwitch({ on, onToggle, color="#FF4D6D" }) {
 // ── Settings Tab ──────────────────────────────────────────────────────────
 function SettingsTab({ light, onToggle, user, onSignOut, onClearAll }) {
   const [notifs,setNotifs]=useState({ email:true, push:true, inapp:true });
-  const card={ background:light?"rgba(255,255,255,0.9)":"rgba(255,255,255,0.04)", border:`1px solid ${light?"rgba(0,0,0,0.07)":"rgba(255,255,255,0.07)"}`, borderRadius:20, padding:"16px 18px", marginBottom:10, boxShadow:light?"0 2px 14px rgba(0,0,0,0.07)":"none" };
-  const lbl={ fontSize:10, color:light?"#bbb":"#555", textTransform:"uppercase", letterSpacing:"0.1em", fontFamily:"'DM Mono',monospace", fontWeight:500, marginBottom:12 };
+  const card={ background:light?"rgba(255,255,255,0.9)":"rgba(255,255,255,0.04)", border:`1px solid ${light?"rgba(0,0,0,0.07)":"rgba(255,255,255,0.07)"}`, borderRadius:20, padding:"20px 22px", marginBottom:14, boxShadow:light?"0 2px 14px rgba(0,0,0,0.06)":"none" };
+  const lbl={ fontSize:10, color:light?"#bbb":"#555", textTransform:"uppercase", letterSpacing:"0.1em", fontFamily:"'DM Mono',monospace", fontWeight:500, marginBottom:14 };
   return (
-    <div style={{ paddingTop:4, animation:"fadeUp 0.3s ease both" }}>
+    <div style={{ maxWidth:600, animation:"fadeUp 0.3s ease both" }}>
       <div style={card}>
         <div style={lbl}>Account</div>
-        <div style={{ display:"flex", alignItems:"center", gap:12, marginBottom:16 }}>
-          <div style={{ width:44, height:44, borderRadius:14, background:"linear-gradient(135deg,#FF4D6D,#FF9000)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:20 }}>👤</div>
+        <div style={{ display:"flex", alignItems:"center", gap:14, marginBottom:18 }}>
+          <div style={{ width:50, height:50, borderRadius:14, background:"linear-gradient(135deg,#FF4D6D,#FF9000)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:22 }}>👤</div>
           <div>
-            <div style={{ fontSize:14, fontWeight:700, color:light?"#111":"#F0ECF8" }}>{user?.email}</div>
-            <div style={{ fontSize:11, color:"#00C9A7", marginTop:2 }}>✅ Logged in — data synced</div>
+            <div style={{ fontSize:15, fontWeight:700, color:light?"#111":"#F0ECF8" }}>{user?.email}</div>
+            <div style={{ fontSize:12, color:"#00C9A7", marginTop:3 }}>✅ Logged in — data synced</div>
           </div>
         </div>
-        <button onClick={onSignOut} style={{ width:"100%", padding:"11px", borderRadius:10, border:"1px solid rgba(255,77,109,0.3)", background:"rgba(255,77,109,0.08)", color:"#FF4D6D", fontSize:13, fontWeight:700, cursor:"pointer", fontFamily:"inherit" }}>🚪 Sign Out</button>
+        <button onClick={onSignOut} style={{ padding:"11px 22px", borderRadius:10, border:"1px solid rgba(255,77,109,0.3)", background:"rgba(255,77,109,0.08)", color:"#FF4D6D", fontSize:13, fontWeight:700, cursor:"pointer", fontFamily:"inherit" }}>🚪 Sign Out</button>
       </div>
       <div style={card}>
         <div style={lbl}>Theme</div>
         <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between" }}>
           <div>
-            <div style={{ fontSize:14, fontWeight:600, color:light?"#222":"#ddd" }}>{light?"☀️ Light Mode":"🌙 Dark Mode"}</div>
-            <div style={{ fontSize:12, color:light?"#aaa":"#666", marginTop:2 }}>Toggle day / night</div>
+            <div style={{ fontSize:15, fontWeight:600, color:light?"#222":"#ddd" }}>{light?"☀️ Light Mode":"🌙 Dark Mode"}</div>
+            <div style={{ fontSize:12, color:light?"#aaa":"#666", marginTop:3 }}>Toggle between day and night</div>
           </div>
           <BB8Toggle checked={!light} onChange={onToggle}/>
         </div>
@@ -849,7 +503,7 @@ function SettingsTab({ light, onToggle, user, onSignOut, onClearAll }) {
       <div style={card}>
         <div style={lbl}>Notifications</div>
         {[["✉️","Email reminders","email","#4A9EF0"],["🔔","Push notifications","push","#FF4D6D"],["📱","In-app alerts","inapp","#00C9A7"]].map(([ic,lb,key,col])=>(
-          <div key={key} style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:12 }}>
+          <div key={key} style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:14 }}>
             <div style={{ fontSize:14, fontWeight:500, color:light?"#333":"#ccc" }}>{ic} {lb}</div>
             <ToggleSwitch on={notifs[key]} color={col} onToggle={()=>setNotifs(p=>({...p,[key]:!p[key]}))}/>
           </div>
@@ -857,7 +511,7 @@ function SettingsTab({ light, onToggle, user, onSignOut, onClearAll }) {
       </div>
       <div style={card}>
         <div style={lbl}>Danger Zone</div>
-        <button onClick={onClearAll} style={{ width:"100%", padding:"11px", borderRadius:10, border:"1px solid rgba(255,77,109,0.3)", background:"rgba(255,77,109,0.08)", color:"#FF4D6D", fontSize:13, fontWeight:700, cursor:"pointer", fontFamily:"inherit" }}>🗑 Delete All My Birthdays</button>
+        <button onClick={onClearAll} style={{ padding:"11px 22px", borderRadius:10, border:"1px solid rgba(255,77,109,0.3)", background:"rgba(255,77,109,0.08)", color:"#FF4D6D", fontSize:13, fontWeight:700, cursor:"pointer", fontFamily:"inherit" }}>🗑 Delete All My Birthdays</button>
       </div>
     </div>
   );
@@ -865,7 +519,7 @@ function SettingsTab({ light, onToggle, user, onSignOut, onClearAll }) {
 
 // ── Alerts Tab ────────────────────────────────────────────────────────────
 function AlertsTab({ light }) {
-  const card={ background:light?"rgba(255,255,255,0.9)":"rgba(255,255,255,0.04)", border:`1px solid ${light?"rgba(0,0,0,0.07)":"rgba(255,255,255,0.07)"}`, borderRadius:20, padding:"16px 18px", marginBottom:10 };
+  const card={ background:light?"rgba(255,255,255,0.9)":"rgba(255,255,255,0.04)", border:`1px solid ${light?"rgba(0,0,0,0.07)":"rgba(255,255,255,0.07)"}`, borderRadius:20, padding:"18px 22px", marginBottom:12, boxShadow:light?"0 2px 14px rgba(0,0,0,0.06)":"none" };
   const integrations=[
     { icon:"📧", name:"EmailJS",            desc:"Send real email reminders",               color:"#4A9EF0", status:"Not connected" },
     { icon:"🔔", name:"Push Notifications", desc:"Browser alerts when app is open",         color:"#FF4D6D", status:"Enabled"       },
@@ -873,17 +527,17 @@ function AlertsTab({ light }) {
     { icon:"🤖", name:"Claude AI",          desc:"Generate personalised birthday messages", color:"#FF9000", status:"Coming soon"   },
   ];
   return (
-    <div style={{ paddingTop:4 }}>
-      <p style={{ color:light?"#999":"#666", fontSize:13, marginBottom:18, lineHeight:1.6 }}>Connect services to get real reminders.</p>
+    <div style={{ maxWidth:600 }}>
+      <p style={{ color:light?"#999":"#666", fontSize:14, marginBottom:24, lineHeight:1.6 }}>Connect services to get real reminders delivered to you.</p>
       {integrations.map((intg,i)=>(
         <div key={intg.name} style={{...card, animation:`slideIn 0.35s ease both`, animationDelay:`${i*60}ms`}}>
-          <div style={{ display:"flex", alignItems:"center", gap:14 }}>
-            <div style={{ width:48, height:48, borderRadius:14, flexShrink:0, background:`${intg.color}18`, border:`1.5px solid ${intg.color}30`, display:"flex", alignItems:"center", justifyContent:"center", fontSize:22 }}>{intg.icon}</div>
+          <div style={{ display:"flex", alignItems:"center", gap:16 }}>
+            <div style={{ width:52, height:52, borderRadius:16, flexShrink:0, background:`${intg.color}18`, border:`1.5px solid ${intg.color}30`, display:"flex", alignItems:"center", justifyContent:"center", fontSize:24 }}>{intg.icon}</div>
             <div style={{ flex:1 }}>
-              <div style={{ fontSize:14, fontWeight:700, color:light?"#111":"#F0ECF8", marginBottom:2 }}>{intg.name}</div>
-              <div style={{ fontSize:12, color:light?"#aaa":"#666" }}>{intg.desc}</div>
+              <div style={{ fontSize:15, fontWeight:700, color:light?"#111":"#F0ECF8", marginBottom:3 }}>{intg.name}</div>
+              <div style={{ fontSize:13, color:light?"#aaa":"#666" }}>{intg.desc}</div>
             </div>
-            <span style={{ fontSize:10, fontFamily:"'DM Mono',monospace", padding:"3px 10px", borderRadius:99, fontWeight:600, flexShrink:0, background:["Not connected","Coming soon"].includes(intg.status)?"rgba(255,255,255,0.05)":`${intg.color}18`, border:`1px solid ${["Not connected","Coming soon"].includes(intg.status)?"rgba(255,255,255,0.08)":`${intg.color}35`}`, color:["Not connected","Coming soon"].includes(intg.status)?light?"#aaa":"#555":intg.color }}>{intg.status}</span>
+            <span style={{ fontSize:10, fontFamily:"'DM Mono',monospace", padding:"4px 12px", borderRadius:99, fontWeight:600, flexShrink:0, background:["Not connected","Coming soon"].includes(intg.status)?"rgba(255,255,255,0.05)":`${intg.color}18`, border:`1px solid ${["Not connected","Coming soon"].includes(intg.status)?"rgba(255,255,255,0.08)":`${intg.color}35`}`, color:["Not connected","Coming soon"].includes(intg.status)?light?"#aaa":"#555":intg.color }}>{intg.status}</span>
           </div>
         </div>
       ))}
@@ -891,9 +545,14 @@ function AlertsTab({ light }) {
   );
 }
 
-// ── Tab & Nav config ──────────────────────────────────────────────────────
-const TABS=[{id:"Upcoming",label:"Upcoming"},{id:"All",label:"All"},{id:"Add",label:"+ Add"},{id:"Alerts",label:"Alerts"},{id:"Settings",label:"⚙️"}];
-const NAV=[{label:"Birthdays",icon:"🎂",tab:"Upcoming"},{label:"Alerts",icon:"🔔",tab:"Alerts"},{label:"+ Add",icon:"✦",tab:"Add"},{label:"Settings",icon:"⚙️",tab:"Settings"}];
+// ── Sidebar Nav items ─────────────────────────────────────────────────────
+const NAV = [
+  { id:"Upcoming", label:"Upcoming",  icon:"🎂" },
+  { id:"All",      label:"All",       icon:"📋" },
+  { id:"Add",      label:"Add New",   icon:"➕" },
+  { id:"Alerts",   label:"Alerts",    icon:"🔔" },
+  { id:"Settings", label:"Settings",  icon:"⚙️" },
+];
 
 // ── Main App ──────────────────────────────────────────────────────────────
 export default function App() {
@@ -904,15 +563,14 @@ export default function App() {
   const [light,    setLight]    = useState(()=>localStorage.getItem("theme")==="light");
   const [toast,    setToast]    = useState(null);
   const [fetching, setFetching] = useState(false);
+  const [search,   setSearch]   = useState("");
 
-  // Auth listener
   useEffect(()=>{
     supabase.auth.getSession().then(({data:{session}})=>{ setSession(session); setLoading(false); });
     const {data:{subscription}}=supabase.auth.onAuthStateChange((_,session)=>setSession(session));
     return ()=>subscription.unsubscribe();
   },[]);
 
-  // Load birthdays when logged in
   useEffect(()=>{ if(!session){setPeople([]);return;} loadBirthdays(); },[session]);
 
   async function loadBirthdays() {
@@ -922,10 +580,10 @@ export default function App() {
     setFetching(false);
   }
 
-  // Save theme
   useEffect(()=>{ localStorage.setItem("theme",light?"light":"dark"); },[light]);
 
   const sorted=[...people].map(p=>({...p,days:daysUntil(p.month,p.day)})).sort((a,b)=>a.days-b.days);
+  const filtered=sorted.filter(p=>p.name.toLowerCase().includes(search.toLowerCase()));
 
   const handleAdd=async(name,month,day,year,note,avatar)=>{
     const {data,error}=await supabase.from("birthdays").insert([{name,month,day,year,note,avatar,user_id:session.user.id}]).select();
@@ -944,7 +602,7 @@ export default function App() {
   };
 
   const handleClearAll=async()=>{
-    if(!window.confirm("Delete ALL your birthdays? This cannot be undone.")) return;
+    if(!window.confirm("Delete ALL birthdays? This cannot be undone.")) return;
     await supabase.from("birthdays").delete().eq("user_id",session.user.id);
     setPeople([]);
     showToast("All birthdays deleted.");
@@ -953,9 +611,15 @@ export default function App() {
   const handleSignOut=async()=>{ await supabase.auth.signOut(); setPeople([]); setTab("Upcoming"); showToast("👋 Signed out!"); };
   const showToast=(msg)=>{ setToast(msg); setTimeout(()=>setToast(null),3000); };
 
-  const bg=light?"#f0edf8":"#080810";
-  const navBg=light?"rgba(250,248,255,0.96)":"rgba(15,15,26,0.97)";
-  const phoneBg=light?"#faf8ff":"#0f0f1a";
+  const TAB_TITLES = { Upcoming:"Upcoming Birthdays", All:"All Birthdays", Add:"Add a Birthday", Alerts:"Alerts & Integrations", Settings:"Settings" };
+
+  // Light/dark tokens
+  const bg        = light?"#f4f1fc":"#080810";
+  const sidebarBg = light?"#ffffff":"#0d0d1a";
+  const borderCol = light?"rgba(0,0,0,0.07)":"rgba(255,255,255,0.06)";
+  const textMain  = light?"#111":"#F0ECF8";
+  const textSub   = light?"#aaa":"#555";
+  const navColor  = light?"#666":"#555";
 
   if(loading) return <div style={{ minHeight:"100vh", background:"#080810", display:"flex", alignItems:"center", justifyContent:"center" }}><style>{CSS}</style><Spinner/></div>;
   if(!session) return <AuthScreen/>;
@@ -963,70 +627,95 @@ export default function App() {
   return (
     <>
       <style>{CSS}</style>
-      <link href="https://fonts.googleapis.com/css2?family=Cabinet+Grotesk:wght@400;500;700;800;900&family=Instrument+Serif:ital@0;1&family=DM+Mono:wght@400;500&family=Poppins:wght@200;300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
-      <div style={{ minHeight:"100vh", background:bg, display:"flex", justifyContent:"center", alignItems:"flex-start", padding:"28px 0 60px", transition:"background 0.4s", fontFamily:"'Cabinet Grotesk',system-ui,sans-serif" }}>
+      {/* Ambient blobs */}
+      <div style={{ position:"fixed", inset:0, pointerEvents:"none", overflow:"hidden", zIndex:0 }}>
+        <div style={{ position:"absolute", top:-100, left:-100, width:500, height:500, background:"radial-gradient(circle,rgba(255,77,109,0.07),transparent 70%)", filter:"blur(60px)", animation:"float 18s ease-in-out infinite alternate" }}/>
+        <div style={{ position:"absolute", bottom:-60, right:-60, width:400, height:400, background:"radial-gradient(circle,rgba(255,144,0,0.06),transparent 70%)", filter:"blur(60px)", animation:"float 22s ease-in-out infinite alternate-reverse" }}/>
+      </div>
 
-        {/* Blobs */}
-        <div style={{ position:"fixed", inset:0, pointerEvents:"none", overflow:"hidden", zIndex:0 }}>
-          <div style={{ position:"absolute", top:-80, left:-80, width:400, height:400, background:"radial-gradient(circle,rgba(255,77,109,0.08),transparent 70%)", filter:"blur(40px)", animation:"float 18s ease-in-out infinite alternate" }}/>
-          <div style={{ position:"absolute", bottom:100, right:-60, width:300, height:300, background:"radial-gradient(circle,rgba(255,144,0,0.07),transparent 70%)", filter:"blur(40px)", animation:"float 22s ease-in-out infinite alternate-reverse" }}/>
+      <div className="app-shell" style={{ background:bg }}>
+
+        {/* ── Sidebar ── */}
+        <div className="sidebar" style={{ background:sidebarBg, borderColor:borderCol }}>
+          {/* Logo */}
+          <div className="sidebar-logo">
+            <span className="sidebar-logo-icon">🎂</span>
+            <span className="sidebar-logo-text">BirthdayPal</span>
+          </div>
+
+          {/* Nav */}
+          <nav className="sidebar-nav">
+            {NAV.map(item=>(
+              <button key={item.id} className={`nav-btn${tab===item.id?" active":""}`}
+                onClick={()=>setTab(item.id)}
+                style={{ color:tab===item.id?"#FF4D6D":navColor }}>
+                <span className="nav-icon">{item.icon}</span>
+                {item.label}
+              </button>
+            ))}
+          </nav>
+
+          {/* User footer */}
+          <div className="sidebar-footer">
+            <div className="user-chip">
+              <div className="user-avatar">👤</div>
+              <div>
+                <div className="user-email" style={{ color:textSub }}>{session?.user?.email}</div>
+                <div style={{ fontSize:10, color:"#00C9A7", marginTop:2 }}>● Synced</div>
+              </div>
+            </div>
+          </div>
         </div>
 
-        {/* Phone */}
-        <div style={{ width:390, minHeight:820, background:phoneBg, borderRadius:52, overflow:"hidden", position:"relative", zIndex:1, boxShadow:light?"0 0 0 1px rgba(255,77,109,0.1),0 40px 100px rgba(0,0,0,0.15)":"0 0 0 1px rgba(255,77,109,0.12),0 60px 150px rgba(0,0,0,0.85),inset 0 1px 0 rgba(255,255,255,0.05)", transition:"background 0.4s", animation:"fadeUp 0.7s cubic-bezier(0.16,1,0.3,1) both" }}>
-
-          {/* Notch */}
-          <div style={{ position:"absolute", top:14, left:"50%", transform:"translateX(-50%)", width:120, height:34, background:"#000", borderRadius:99, zIndex:100, display:"flex", alignItems:"center", justifyContent:"center", gap:8 }}>
-            <div style={{ width:10, height:10, borderRadius:"50%", background:"#1a1a2e", border:"1.5px solid #333" }}/>
-            <div style={{ width:4, height:4, borderRadius:"50%", background:"#4A9EF0", boxShadow:"0 0 6px #4A9EF0" }}/>
-          </div>
-
-          {/* Status bar */}
-          <div style={{ height:54, display:"flex", alignItems:"center", justifyContent:"space-between", padding:"0 28px", paddingTop:10 }}>
-            <span style={{ fontSize:13, fontWeight:700, fontFamily:"'DM Mono',monospace", color:light?"#333":"#ccc" }}>9:41</span>
-            <span style={{ fontSize:12, color:light?"#999":"#555", letterSpacing:2 }}>● ● ●</span>
-          </div>
-
-          {/* Header */}
-          <div style={{ padding:"6px 22px 0" }}>
-            <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:12 }}>
-              <div>
-                <div style={{ fontFamily:"'Instrument Serif',serif", fontSize:32, background:"linear-gradient(135deg,#FF4D6D,#FF8FA3)", WebkitBackgroundClip:"text", WebkitTextFillColor:"transparent", lineHeight:1.05 }}>BirthdayPal</div>
-                <div style={{ fontSize:12, color:light?"#aaa":"#555", marginTop:1 }}>{people.length} {people.length===1?"birthday":"birthdays"} tracked</div>
+        {/* ── Main ── */}
+        <div className="main-content">
+          {/* Topbar */}
+          <div className="topbar" style={{ borderColor:borderCol, background:light?"rgba(255,255,255,0.7)":"rgba(13,13,26,0.8)", backdropFilter:"blur(20px)" }}>
+            <div>
+              <div className="topbar-title">{TAB_TITLES[tab]}</div>
+              <div className="topbar-count" style={{ color:textSub }}>{people.length} {people.length===1?"birthday":"birthdays"} tracked</div>
+            </div>
+            {tab==="All" && (
+              <div style={{ position:"relative" }}>
+                <span style={{ position:"absolute", left:12, top:"50%", transform:"translateY(-50%)", opacity:0.4 }}>🔍</span>
+                <input className="bp-input" value={search} onChange={e=>setSearch(e.target.value)}
+                  style={{ padding:"9px 14px 9px 36px", background:light?"rgba(0,0,0,0.04)":"rgba(255,255,255,0.05)", border:`1px solid ${borderCol}`, borderRadius:12, color:textMain, fontSize:14, fontFamily:"'Cabinet Grotesk',sans-serif", width:220 }}
+                  placeholder="Search…"/>
               </div>
-              <div style={{ width:44, height:44, borderRadius:14, background:light?"rgba(255,77,109,0.1)":"rgba(255,77,109,0.12)", border:"1.5px solid rgba(255,77,109,0.25)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:22, boxShadow:"0 4px 16px rgba(255,77,109,0.15)" }}>🎂</div>
-            </div>
-            <div style={{ display:"flex", gap:3, background:light?"rgba(0,0,0,0.05)":"rgba(255,255,255,0.04)", borderRadius:14, padding:"3px", marginBottom:14 }}>
-              {TABS.map(t=>(
-                <button key={t.id} className={`tab-pill ${tab===t.id?"active-tab":""}`} onClick={()=>setTab(t.id)} style={{ flex:1, padding:"7px 0", borderRadius:11, border:"none", background:"transparent", color:tab===t.id?"#fff":light?"#999":"#555", fontSize:11, fontWeight:700, cursor:"pointer", fontFamily:"'Cabinet Grotesk',sans-serif" }}>{t.label}</button>
-              ))}
-            </div>
+            )}
           </div>
 
           {/* Content */}
-          <div className="scroll-area" style={{ padding:"0 16px 100px", overflowY:"auto", maxHeight:560 }}>
+          <div className="content-area">
             {fetching ? <Spinner/> : <>
               {tab==="Upcoming" && (
                 <div>
-                  {sorted[0] && <CountdownRing days={sorted[0].days} name={sorted[0].name} avatar={sorted[0].avatar} light={light}/>}
-                  <div style={{ fontSize:10, fontFamily:"'DM Mono',monospace", fontWeight:600, color:light?"#ccc":"#555", letterSpacing:"0.12em", textTransform:"uppercase", marginBottom:10 }}>All upcoming</div>
+                  {sorted[0] && (
+                    <div style={{ marginBottom:28 }}>
+                      <CountdownRing days={sorted[0].days} name={sorted[0].name} avatar={sorted[0].avatar} color={urgencyColor(sorted[0].days)} light={light}/>
+                    </div>
+                  )}
                   {sorted.length===0
-                    ? <div style={{ textAlign:"center", padding:"40px 0" }}>
-                        <div style={{ fontSize:48, marginBottom:12 }}>🎂</div>
-                        <div style={{ fontSize:14, color:light?"#bbb":"#555" }}>No birthdays yet!</div>
-                        <div style={{ fontSize:12, color:light?"#ccc":"#444", marginTop:6 }}>Tap "+ Add" to get started</div>
+                    ? <div style={{ textAlign:"center", padding:"80px 0" }}>
+                        <div style={{ fontSize:64, marginBottom:16 }}>🎂</div>
+                        <div style={{ fontSize:18, color:textSub, marginBottom:8 }}>No birthdays yet!</div>
+                        <div style={{ fontSize:14, color:light?"#ccc":"#444" }}>Click "Add New" in the sidebar to get started</div>
                       </div>
-                    : sorted.map((p,i)=><BirthdayCard key={p.id} person={p} light={light} delay={i*50} onDelete={handleDelete}/>)
+                    : <>
+                        <div style={{ fontSize:10, fontFamily:"'DM Mono',monospace", fontWeight:600, color:light?"#ccc":"#444", letterSpacing:"0.12em", textTransform:"uppercase", marginBottom:14 }}>All upcoming</div>
+                        <div className="cards-grid">
+                          {sorted.map((p,i)=><BirthdayCard key={p.id} person={p} light={light} delay={i*40} onDelete={handleDelete}/>)}
+                        </div>
+                      </>
                   }
                 </div>
               )}
               {tab==="All" && (
-                <div>
-                  <div style={{ position:"relative", marginBottom:14 }}>
-                    <span style={{ position:"absolute", left:14, top:"50%", transform:"translateY(-50%)", fontSize:14, pointerEvents:"none", opacity:0.4 }}>🔍</span>
-                    <input className="bp-input" style={{ width:"100%", padding:"10px 14px 10px 38px", background:light?"rgba(0,0,0,0.04)":"rgba(255,255,255,0.05)", border:`1px solid ${light?"rgba(0,0,0,0.08)":"rgba(255,255,255,0.08)"}`, borderRadius:12, color:light?"#111":"#F0ECF8", fontSize:14, fontFamily:"'Cabinet Grotesk',sans-serif" }} placeholder="Search birthdays…"/>
-                  </div>
-                  {sorted.map((p,i)=><BirthdayCard key={p.id} person={p} light={light} delay={i*40} onDelete={handleDelete}/>)}
+                <div className="cards-grid">
+                  {filtered.length===0
+                    ? <div style={{ color:textSub, fontSize:14, padding:"40px 0" }}>No results found.</div>
+                    : filtered.map((p,i)=><BirthdayCard key={p.id} person={p} light={light} delay={i*30} onDelete={handleDelete}/>)
+                  }
                 </div>
               )}
               {tab==="Add"      && <AddForm onAdd={handleAdd} light={light}/>}
@@ -1034,22 +723,11 @@ export default function App() {
               {tab==="Settings" && <SettingsTab light={light} onToggle={()=>setLight(v=>!v)} user={session?.user} onSignOut={handleSignOut} onClearAll={handleClearAll}/>}
             </>}
           </div>
-
-          {/* Bottom nav */}
-          <div style={{ position:"absolute", bottom:0, left:0, right:0, height:72, background:navBg, backdropFilter:"blur(24px)", borderTop:`1px solid ${light?"rgba(0,0,0,0.06)":"rgba(255,255,255,0.05)"}`, display:"flex", alignItems:"center", justifyContent:"space-around", padding:"0 8px 10px", transition:"background 0.4s" }}>
-            {NAV.map(item=>{ const active=tab===item.tab; return (
-              <div key={item.tab} className="nav-item" onClick={()=>setTab(item.tab)} style={{ display:"flex", flexDirection:"column", alignItems:"center", gap:2 }}>
-                <span style={{ fontSize:22, opacity:active?1:0.45, transition:"all 0.2s" }}>{item.icon}</span>
-                <span style={{ fontSize:9, fontWeight:700, letterSpacing:"0.06em", color:active?"#FF4D6D":light?"#bbb":"#444", fontFamily:"'DM Mono',monospace", textTransform:"uppercase", transition:"color 0.2s" }}>{item.label}</span>
-                {active && <div style={{ width:18, height:2, borderRadius:99, background:"#FF4D6D", marginTop:1, boxShadow:"0 0 8px rgba(255,77,109,0.6)" }}/>}
-              </div>
-            );})}
-          </div>
         </div>
-
-        {/* Toast */}
-        {toast && <div style={{ position:"fixed", bottom:32, left:"50%", transform:"translateX(-50%)", background:"linear-gradient(135deg,#FF4D6D,#FF1744)", color:"#fff", padding:"12px 22px", borderRadius:14, fontSize:14, fontWeight:700, boxShadow:"0 8px 32px rgba(255,77,109,0.45)", fontFamily:"'Cabinet Grotesk',sans-serif", zIndex:999, animation:"toastIn 0.35s cubic-bezier(0.16,1,0.3,1) both", whiteSpace:"nowrap" }}>{toast}</div>}
       </div>
+
+      {/* Toast */}
+      {toast && <div style={{ position:"fixed", bottom:32, left:"50%", transform:"translateX(-50%)", background:"linear-gradient(135deg,#FF4D6D,#FF1744)", color:"#fff", padding:"13px 24px", borderRadius:14, fontSize:14, fontWeight:700, boxShadow:"0 8px 32px rgba(255,77,109,0.45)", fontFamily:"'Cabinet Grotesk',sans-serif", zIndex:9999, animation:"toastIn 0.35s cubic-bezier(0.16,1,0.3,1) both", whiteSpace:"nowrap" }}>{toast}</div>}
     </>
   );
 }
