@@ -1,11 +1,38 @@
 import { useState, useEffect } from "react";
 import { createClient } from "@supabase/supabase-js";
+import emailjs from "@emailjs/browser";
 
 // ── Supabase Setup ────────────────────────────────────────────────────────
 const supabase = createClient(
   "https://odyovlemiubcdatwyhpk.supabase.co",
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9keW92bGVtaXViY2RhdHd5aHBrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE2MzM2NTksImV4cCI6MjA4NzIwOTY1OX0.yna87uzRwmz1eLUTCZLy5DztMdqsH_SHOTLwzlotfqw"
 );
+
+// ── EmailJS Setup ─────────────────────────────────────────────────────────
+const EMAILJS_SERVICE  = "service_o7pk8t4";
+const EMAILJS_TEMPLATE = "template_07ijv0f";
+const EMAILJS_KEY      = "iYdC5C2QCpeWOMWf0";
+emailjs.init(EMAILJS_KEY);
+
+// Remind days mapping
+const REMIND_DAYS = { "1 day":1, "3 days":3, "1 week":7, "2 weeks":14 };
+
+async function sendBirthdayReminder(toEmail, person, daysUntilBday) {
+  try {
+    await emailjs.send(EMAILJS_SERVICE, EMAILJS_TEMPLATE, {
+      to_email: toEmail,
+      name:     person.name,
+      days:     daysUntilBday,
+      date:     `${MONTHS_FULL[person.month-1]} ${person.day}`,
+      age:      person.year ? new Date().getFullYear() - person.year : "?",
+      note:     person.note || "No note added",
+    });
+    return true;
+  } catch(e) {
+    console.error("EmailJS error:", e);
+    return false;
+  }
+}
 
 const MONTHS_FULL = ["January","February","March","April","May","June","July","August","September","October","November","December"];
 
@@ -60,7 +87,7 @@ body { font-family: 'Cabinet Grotesk', system-ui, sans-serif; overflow: hidden; 
 @property --a { syntax: '<angle>'; inherits: false; initial-value: 0deg; }
 
 .auth-page {
-  min-height: 100vh; background: #25252b;
+  min-height: 100vh; width: 100vw; background: #25252b;
   display: flex; flex-direction: column;
   justify-content: center; align-items: center;
   padding: 20px; gap: 28px; position: relative; overflow: hidden;
@@ -73,7 +100,7 @@ body { font-family: 'Cabinet Grotesk', system-ui, sans-serif; overflow: hidden; 
 .auth-logo-title { font-family:'Instrument Serif',serif; font-size:42px; background:linear-gradient(135deg,#ff2770,#45f3ff); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
 .auth-logo-sub { font-size:13px; color:#666; margin-top:4px; font-family:'DM Mono',monospace; letter-spacing:0.05em; }
 
-.box { position:relative; width:420px; height:210px; background:repeating-conic-gradient(from var(--a),#ff2770 0%,#ff2770 5%,transparent 5%,transparent 40%,#ff2770 50%); filter:drop-shadow(0 15px 50px #000); border-radius:20px; animation:rotating 4s linear infinite; display:flex; justify-content:center; align-items:center; transition:0.5s; z-index:10; cursor:pointer; }
+.box { position:relative; width:420px; height:210px; background:repeating-conic-gradient(from var(--a),#ff2770 0%,#ff2770 5%,transparent 5%,transparent 40%,#ff2770 50%); filter:drop-shadow(0 15px 50px #000); border-radius:20px; animation:rotating 4s linear infinite; display:flex; justify-content:center; align-items:center; transition:0.5s; z-index:10; cursor:pointer; margin:0 auto; }
 @keyframes rotating { 0%{--a:0deg} 100%{--a:360deg} }
 .box::before { content:""; position:absolute; width:100%; height:100%; background:repeating-conic-gradient(from var(--a),#45f3ff 0%,#45f3ff 5%,transparent 5%,transparent 40%,#45f3ff 50%); filter:drop-shadow(0 15px 50px #000); border-radius:20px; animation:rotating 4s linear infinite; animation-delay:-1s; }
 .box::after { content:""; position:absolute; inset:4px; background:#2d2d39; border-radius:15px; border:8px solid #25252b; }
@@ -103,13 +130,11 @@ body { font-family: 'Cabinet Grotesk', system-ui, sans-serif; overflow: hidden; 
 .auth-msg.error { background:rgba(255,39,112,0.12); border:1px solid rgba(255,39,112,0.3); color:#ff2770; }
 
 /* ── App Layout ── */
-.app-shell { display:flex; height:100vh; overflow:hidden; transition:background 0.4s; }
-
-/* Sidebar */
-.sidebar { width:240px; flex-shrink:0; display:flex; flex-direction:column; padding:28px 16px; border-right:1px solid; transition:background 0.4s, border-color 0.4s; z-index:10; }
-.sidebar-logo { display:flex; align-items:center; gap:10px; padding:0 8px; margin-bottom:36px; }
-.sidebar-logo-icon { font-size:28px; }
-.sidebar-logo-text { font-family:'Instrument Serif',serif; font-size:24px; background:linear-gradient(135deg,#FF4D6D,#FF8FA3); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+.app-shell { display:flex; height:100vh; width:100vw; overflow:hidden; transition:background 0.4s; }
+.sidebar { width:220px; flex-shrink:0; display:flex; flex-direction:column; padding:24px 14px; border-right:1px solid; transition:background 0.4s,border-color 0.4s; z-index:10; }
+.sidebar-logo { display:flex; align-items:center; gap:10px; padding:0 8px; margin-bottom:32px; }
+.sidebar-logo-icon { font-size:26px; }
+.sidebar-logo-text { font-family:'Instrument Serif',serif; font-size:22px; background:linear-gradient(135deg,#FF4D6D,#FF8FA3); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
 .sidebar-nav { display:flex; flex-direction:column; gap:4px; flex:1; }
 .nav-btn { display:flex; align-items:center; gap:12px; padding:11px 14px; border-radius:14px; border:none; cursor:pointer; font-family:'Cabinet Grotesk',sans-serif; font-size:14px; font-weight:600; transition:all 0.2s; text-align:left; width:100%; background:transparent; }
 .nav-btn.active { background:linear-gradient(135deg,rgba(255,77,109,0.18),rgba(255,77,109,0.08)); color:#FF4D6D; box-shadow:inset 0 0 0 1px rgba(255,77,109,0.25); }
@@ -117,20 +142,39 @@ body { font-family: 'Cabinet Grotesk', system-ui, sans-serif; overflow: hidden; 
 .sidebar-footer { margin-top:auto; padding-top:16px; border-top:1px solid rgba(255,255,255,0.06); }
 .user-chip { display:flex; align-items:center; gap:10px; padding:10px 12px; border-radius:12px; }
 .user-avatar { width:34px; height:34px; border-radius:10px; background:linear-gradient(135deg,#FF4D6D,#FF9000); display:flex; align-items:center; justify-content:center; font-size:16px; flex-shrink:0; }
-.user-email { font-size:11px; font-family:'DM Mono',monospace; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-
-/* Main content */
-.main-content { flex:1; display:flex; flex-direction:column; overflow:hidden; }
-.topbar { display:flex; align-items:center; justify-content:space-between; padding:20px 32px; border-bottom:1px solid; flex-shrink:0; transition:border-color 0.4s; }
-.topbar-title { font-family:'Instrument Serif',serif; font-size:28px; background:linear-gradient(135deg,#FF4D6D,#FF8FA3); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+.user-email { font-size:11px; font-family:'DM Mono',monospace; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:140px; }
+.main-content { flex:1; min-width:0; width:0; display:flex; flex-direction:column; overflow:hidden; }
+.topbar { display:flex; align-items:center; justify-content:space-between; padding:18px 28px; border-bottom:1px solid; flex-shrink:0; transition:border-color 0.4s; }
+.topbar-title { font-family:'Instrument Serif',serif; font-size:26px; background:linear-gradient(135deg,#FF4D6D,#FF8FA3); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
 .topbar-count { font-size:12px; font-family:'DM Mono',monospace; margin-top:2px; }
-.content-area { flex:1; overflow-y:auto; padding:28px 32px 32px; }
+.content-area { flex:1; overflow-y:auto; padding:24px 28px 28px; width:100%; box-sizing:border-box; }
 .content-area::-webkit-scrollbar { width:4px; }
 .content-area::-webkit-scrollbar-track { background:transparent; }
 .content-area::-webkit-scrollbar-thumb { background:rgba(255,255,255,0.1); border-radius:99px; }
+.cards-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(280px, 1fr)); gap:14px; width:100%; }
 
-/* Cards grid for upcoming */
-.cards-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(340px, 1fr)); gap:14px; }
+/* Mobile bottom nav */
+.mobile-nav { display:none; }
+
+/* ── Responsive Mobile ── */
+@media (max-width: 768px) {
+  .app-shell { flex-direction:column; }
+  .sidebar { display:none; }
+  .main-content { flex:1; width:100%; min-width:0; }
+  .topbar { padding:12px 16px; }
+  .topbar-title { font-size:20px; }
+  .content-area { padding:14px 12px 100px; }
+  .cards-grid { grid-template-columns:1fr; }
+  .mobile-nav { display:flex; position:fixed; bottom:0; left:0; right:0; height:68px; background:rgba(13,13,26,0.97); backdrop-filter:blur(20px); border-top:1px solid rgba(255,255,255,0.06); align-items:center; justify-content:space-around; padding:0 4px 8px; z-index:100; }
+  .mobile-nav-btn { display:flex; flex-direction:column; align-items:center; gap:3px; cursor:pointer; border:none; background:transparent; padding:6px 10px; flex:1; }
+  .mobile-nav-icon { font-size:20px; opacity:0.4; transition:opacity 0.2s; }
+  .mobile-nav-label { font-size:9px; font-weight:700; letter-spacing:0.06em; color:#444; font-family:'DM Mono',monospace; text-transform:uppercase; }
+  .mobile-nav-btn.active .mobile-nav-icon { opacity:1; }
+  .mobile-nav-btn.active .mobile-nav-label { color:#FF4D6D; }
+  .mobile-nav-dot { width:16px; height:2px; border-radius:99px; background:#FF4D6D; box-shadow:0 0 8px rgba(255,77,109,0.6); margin-top:1px; }
+  .box { width:92vw; max-width:360px; }
+  .box.expanded { width:92vw; max-width:400px; height:520px; }
+}
 
 /* ── Glowy Button ── */
 :root { --gx:200; --gy:400; --gxp:.5; --gsize:130px; }
@@ -426,7 +470,18 @@ function AddForm({ onAdd, light }) {
   const avatarOptions=["🎂","👩","🧑","👨","👧","👦","👴","👵","🌟","💫","🎉","🎊"];
   const inp={ width:"100%", padding:"12px 16px", background:light?"rgba(0,0,0,0.04)":"rgba(255,255,255,0.05)", border:`1px solid ${light?"rgba(0,0,0,0.1)":"rgba(255,255,255,0.09)"}`, borderRadius:12, color:light?"#111":"#F0ECF8", fontSize:14, fontFamily:"'Cabinet Grotesk',sans-serif", marginBottom:12, display:"block" };
   const lbl={ fontSize:10, color:light?"#aaa":"#666", letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:5, display:"block", fontFamily:"'DM Mono',monospace", fontWeight:500 };
-  const handleSubmit=async()=>{ if(!name||!month||!day) return; setSaving(true); await onAdd(name,Number(month),Number(day),year?Number(year):null,note,avatar); setName("");setMonth("");setDay("");setYear("");setNote("");setAvatar("🎂"); setSaving(false); };
+  const currentYear = new Date().getFullYear();
+  const handleSubmit=async()=>{
+    if(!name||!month||!day) return;
+    if(year && (Number(year) < 1900 || Number(year) > currentYear)) {
+      alert(`Please enter a valid year between 1900 and ${currentYear}`);
+      return;
+    }
+    setSaving(true);
+    await onAdd(name,Number(month),Number(day),year?Number(year):null,note,avatar);
+    setName("");setMonth("");setDay("");setYear("");setNote("");setAvatar("🎂");
+    setSaving(false);
+  };
 
   return (
     <div style={{ maxWidth:560, animation:"fadeUp 0.3s ease both" }}>
@@ -446,7 +501,7 @@ function AddForm({ onAdd, light }) {
           {MONTHS_FULL.map((m,i)=><option key={m} value={i+1}>{m}</option>)}
         </select>
         <input className="bp-input" style={{...inp,marginBottom:0}} type="number" placeholder="Day" min={1} max={31} value={day} onChange={e=>setDay(e.target.value)}/>
-        <input className="bp-input" style={{...inp,marginBottom:0}} type="number" placeholder="Year" min={1900} max={new Date().getFullYear()} value={year} onChange={e=>setYear(e.target.value)}/>
+        <input className="bp-input" style={{...inp,marginBottom:0}} type="number" placeholder="Year" min={1900} max={new Date().getFullYear()} value={year} onChange={e=>{const v=e.target.value; if(v===""||( Number(v)>=1900 && Number(v)<=new Date().getFullYear())) setYear(v);}}/>
       </div>
       <label style={lbl}>Note (optional)</label>
       <input className="bp-input" style={inp} placeholder="e.g. Loves sunflowers…" value={note} onChange={e=>setNote(e.target.value)}/>
@@ -521,10 +576,10 @@ function SettingsTab({ light, onToggle, user, onSignOut, onClearAll }) {
 function AlertsTab({ light }) {
   const card={ background:light?"rgba(255,255,255,0.9)":"rgba(255,255,255,0.04)", border:`1px solid ${light?"rgba(0,0,0,0.07)":"rgba(255,255,255,0.07)"}`, borderRadius:20, padding:"18px 22px", marginBottom:12, boxShadow:light?"0 2px 14px rgba(0,0,0,0.06)":"none" };
   const integrations=[
-    { icon:"📧", name:"EmailJS",            desc:"Send real email reminders",               color:"#4A9EF0", status:"Not connected" },
-    { icon:"🔔", name:"Push Notifications", desc:"Browser alerts when app is open",         color:"#FF4D6D", status:"Enabled"       },
-    { icon:"📅", name:"Google Calendar",    desc:"Export birthdays as recurring events",    color:"#00C9A7", status:"Ready"         },
-    { icon:"🤖", name:"Claude AI",          desc:"Generate personalised birthday messages", color:"#FF9000", status:"Coming soon"   },
+    { icon:"📧", name:"EmailJS",            desc:"Sends real email reminders to your Gmail",  color:"#4A9EF0", status:"Connected ✅"  },
+    { icon:"🔔", name:"Push Notifications", desc:"Browser alerts when app is open",           color:"#FF4D6D", status:"Enabled"       },
+    { icon:"📅", name:"Google Calendar",    desc:"Export birthdays as recurring events",      color:"#00C9A7", status:"Coming soon"   },
+    { icon:"🤖", name:"Claude AI",          desc:"Generate personalised birthday messages",   color:"#FF9000", status:"Coming soon"   },
   ];
   return (
     <div style={{ maxWidth:600 }}>
@@ -576,8 +631,27 @@ export default function App() {
   async function loadBirthdays() {
     setFetching(true);
     const {data,error}=await supabase.from("birthdays").select("*").order("month",{ascending:true});
-    if(!error) setPeople(data||[]);
+    if(!error) {
+      setPeople(data||[]);
+      // Check reminders
+      checkReminders(data||[], session.user.email);
+    }
     setFetching(false);
+  }
+
+  async function checkReminders(birthdays, userEmail) {
+    const today = new Date().toDateString();
+    const lastCheck = localStorage.getItem("lastReminderCheck");
+    if(lastCheck === today) return; // Only check once per day
+
+    for(const person of birthdays) {
+      const days = daysUntil(person.month, person.day);
+      const remindAt = REMIND_DAYS[person.remind || "1 week"];
+      if(days === remindAt || days === 1 || days === 0) {
+        await sendBirthdayReminder(userEmail, person, days);
+      }
+    }
+    localStorage.setItem("lastReminderCheck", today);
   }
 
   useEffect(()=>{ localStorage.setItem("theme",light?"light":"dark"); },[light]);
@@ -586,7 +660,7 @@ export default function App() {
   const filtered=sorted.filter(p=>p.name.toLowerCase().includes(search.toLowerCase()));
 
   const handleAdd=async(name,month,day,year,note,avatar)=>{
-    const {data,error}=await supabase.from("birthdays").insert([{name,month,day,year,note,avatar,user_id:session.user.id}]).select();
+    const {data,error}=await supabase.from("birthdays").insert([{name,month,day,year,note,avatar,remind,user_id:session.user.id}]).select();
     if(error){showToast("❌ "+error.message);return;}
     setPeople(p=>[...p,...data]);
     launchConfetti();
@@ -726,8 +800,19 @@ export default function App() {
         </div>
       </div>
 
+      {/* Mobile Bottom Nav */}
+      <div className="mobile-nav">
+        {NAV.map(item=>(
+          <button key={item.id} className={`mobile-nav-btn${tab===item.id?" active":""}`} onClick={()=>setTab(item.id)}>
+            <span className="mobile-nav-icon">{item.icon}</span>
+            <span className="mobile-nav-label">{item.label}</span>
+            {tab===item.id && <div className="mobile-nav-dot"/>}
+          </button>
+        ))}
+      </div>
+
       {/* Toast */}
-      {toast && <div style={{ position:"fixed", bottom:32, left:"50%", transform:"translateX(-50%)", background:"linear-gradient(135deg,#FF4D6D,#FF1744)", color:"#fff", padding:"13px 24px", borderRadius:14, fontSize:14, fontWeight:700, boxShadow:"0 8px 32px rgba(255,77,109,0.45)", fontFamily:"'Cabinet Grotesk',sans-serif", zIndex:9999, animation:"toastIn 0.35s cubic-bezier(0.16,1,0.3,1) both", whiteSpace:"nowrap" }}>{toast}</div>}
+      {toast && <div style={{ position:"fixed", bottom:80, left:"50%", transform:"translateX(-50%)", background:"linear-gradient(135deg,#FF4D6D,#FF1744)", color:"#fff", padding:"13px 24px", borderRadius:14, fontSize:14, fontWeight:700, boxShadow:"0 8px 32px rgba(255,77,109,0.45)", fontFamily:"'Cabinet Grotesk',sans-serif", zIndex:9999, animation:"toastIn 0.35s cubic-bezier(0.16,1,0.3,1) both", whiteSpace:"nowrap" }}>{toast}</div>}
     </>
   );
 }
